@@ -58,6 +58,7 @@ describe('modulesWithKeyword', () => {
 })
 
 describe('checkForNewServerVersion', () => {
+  const newMinorVersionInfo = { version: '1.18.0', disttag: 'latest', minimumNodeVersio: '10'}
   it('normal version upgrade', done => {
     checkForNewServerVersion(
       '1.17.0',
@@ -65,77 +66,82 @@ describe('checkForNewServerVersion', () => {
         if (err) {
           done(err)
         } else {
-          chai.expect(newVersion).to.equal('1.18.0')
+          chai.expect(newVersion).to.equal(newMinorVersionInfo.version)
           done()
         }
       },
-      () => Promise.resolve('1.18.0')
+      () => Promise.resolve(newMinorVersionInfo)
     )
   })
 
   it('normal version does not upgrade to beta', done => {
+    const newBetaVersion = { version: '1.18.0-beta.2', disttag: 'latest', minimumNodeVersio: '10'}
     checkForNewServerVersion(
       '1.17.0',
       err => {
         done('callback should not be called')
       },
-      () => Promise.resolve('1.18.0-beta.1')
+      () => Promise.resolve(newBetaVersion)
     )
     done()
   })
 
   it('beta upgrades to same minor newer beta', done => {
+    const newerBetaVersionInfo = { version: '1.18.0-beta.2', disttag: 'latest', minimumNodeVersio: '10'}
     checkForNewServerVersion(
       '1.18.0-beta.1',
       (err, newVersion) => {
         if (err) {
           done(err)
         } else {
-          chai.expect(newVersion).to.equal('1.18.0-beta.2')
+          chai.expect(newVersion).to.equal(newerBetaVersionInfo.version)
           done()
         }
       },
-      () => Promise.resolve('1.18.0-beta.2')
+      () => Promise.resolve(newerBetaVersionInfo)
     )
   })
 
   it('beta upgrades to same normal version', done => {
+    const sameNormalVersion = { version: '1.18.0', disttag: 'latest', minimumNodeVersio: '10'}
     checkForNewServerVersion(
       '1.18.0-beta.2',
       (err, newVersion) => {
         if (err) {
           done(err)
         } else {
-          chai.expect(newVersion).to.equal('1.18.0')
+          chai.expect(newVersion).to.equal(sameNormalVersion.version)
           done()
         }
       },
-      () => Promise.resolve('1.18.0')
+      () => Promise.resolve(sameNormalVersion)
     )
   })
 
   it('beta upgrades to newer normal version', done => {
+    const newerNormalVersion = { version: '1.19.0', disttag: 'latest', minimumNodeVersio: '10'}
     checkForNewServerVersion(
       '1.18.0-beta.2',
       (err, newVersion) => {
         if (err) {
           done(err)
         } else {
-          chai.expect(newVersion).to.equal('1.19.0')
+          chai.expect(newVersion).to.equal(newerNormalVersion.version)
           done()
         }
       },
-      () => Promise.resolve('1.19.0')
+      () => Promise.resolve(newerNormalVersion)
     )
   })
 
   it('beta does not upgrade to newer minor beta', done => {
+    const nextMinorBetaVersion = { version: '1.18.0-beta.2', disttag: 'latest', minimumNodeVersio: '10'}
     checkForNewServerVersion(
       '1.17.0-beta.1',
       err => {
         done('callback should not be called')
       },
-      () => Promise.resolve('1.18.0-beta.2')
+      () => Promise.resolve(nextMinorBetaVersion)
     )
     done()
   })
